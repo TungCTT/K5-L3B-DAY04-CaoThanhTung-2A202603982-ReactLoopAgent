@@ -1,14 +1,28 @@
 """Bốn provider cùng một interface. Không chứa agent loop."""
 import json
 import os
+from pathlib import Path
 import urllib.error
 import urllib.request
+
+# Tự động nạp file .env nếu có mà không ghi đè biến môi trường hiện hữu
+_env_path = Path(__file__).resolve().parent / '.env'
+if _env_path.exists():
+    try:
+        for _line in _env_path.read_text(encoding='utf-8').splitlines():
+            _line = _line.strip()
+            if _line and not _line.startswith('#') and '=' in _line:
+                _k, _v = _line.split('=', 1)
+                os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
+    except Exception:
+        pass
 
 CONFIG = {
     'openai': ('OPENAI_API_KEY', 'https://api.openai.com/v1/chat/completions'),
     'gemini': ('GEMINI_API_KEY', 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'),
     'openrouter': ('OPENROUTER_API_KEY', 'https://openrouter.ai/api/v1/chat/completions'),
     'anthropic': ('ANTHROPIC_API_KEY', 'https://api.anthropic.com/v1/messages'),
+    'deepseek': ('DEEPSEEK_API_KEY', 'https://api.deepseek.com/chat/completions'),
 }
 
 
